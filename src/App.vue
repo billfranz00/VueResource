@@ -13,6 +13,9 @@
                 </div>
                 <button class="btn btn-primary" @click="submit">Submit</button>
                 <hr>
+                <input class="form-control" type="text" v-model="node">
+                <br>
+                <br>
                 <button class="btn btn-primary" @click="fetchData">Get Data</button>
                 <br>
                 <br>
@@ -32,35 +35,45 @@
     				username: '',
     				email: ''
     			},
-    			users: []
+    			users: [],
+                resource: '',
+                node: 'data'
     		}
     	},
     	methods: {
     		submit() {
-    			console.log(this.user);
-    			// this.$http.post('https://vuejs-httpvueresourcetutorial.firebaseio.com/data.json', this.user)
-    			this.$http.post('', this.user)
-    				.then(response => {
-    					console.log(response);
-    				}, error => {
-    					console.log(error);
-    				});
+    			// console.log(this.user);
+    			// // this.$http.post('https://vuejs-httpvueresourcetutorial.firebaseio.com/data.json', this.user)
+    			// this.$http.post('', this.user)
+    			// 	.then(response => {
+    			// 		console.log(response);
+    			// 	}, error => {
+    			// 		console.log(error);
+    			// 	});
+                // this.resource.save({}, this.user);
+                this.resource.saveAlt(this.user)
+                    .then(response => {
+                        console.log(response);
+                    }, error => {
+                        console.log(error);
+                    });
     		},
     		fetchData() {
     			// this.$http.get('https://vuejs-httpvueresourcetutorial.firebaseio.com/data.json')
-    			this.$http.get('')
-    				.then(response => { // Using .json() method to extract body object from response
-    					console.log(response);
-    					return response.json();
-    				})
-    				.then(data => {
-    					console.log(data);
-    					const resultArray = [];
-    					for(let key in data) {
-    						resultArray.push(data[key]);
-    					}
-    					this.users = resultArray;
-    				});
+    			// this.$http.get('')
+                // this.$http.get('data.json')
+    				// .then(response => { // Using .json() method to extract body object from response
+    				// 	console.log(response);
+    				// 	return response.json();
+    				// })
+    				// .then(data => {
+    				// 	console.log(data);
+    				// 	const resultArray = [];
+    				// 	for(let key in data) {
+    				// 		resultArray.push(data[key]);
+    				// 	}
+    				// 	this.users = resultArray;
+    				// });
     				// .then(response => { // Using body of response object
     				// 	console.log(response.body);
     				// 	const resultArray = [];
@@ -69,8 +82,28 @@
     				// 	}
     				// 	this.users = resultArray;
     				// });
+                this.resource.getData({ node: this.node })
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        const resultArray = [];
+                        for(let key in data) {
+                            resultArray.push(data[key]);
+                        }
+                        this.users = resultArray;
+                    });
     		}
-    	}
+    	},
+        created() {
+            const customActions = {
+                saveAlt: { method: 'POST', url: 'alternative.json' },
+                getData: { method: 'GET' }
+            };
+            // this.resource = this.$resource('data.json');
+            this.resource = this.$resource('{node}.json', {}, customActions);
+        }
     }
 </script>
 
